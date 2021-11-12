@@ -7,7 +7,7 @@ int position_gouvernail = 90;    // position gouvernail 0
 int position_voile = 90;         // position voile 0
 
 int angle_gouvernail[9] = {30, 45, 60, 75, 90, 115, 130, 145, 170}; //angles possibles pour le gouvernail
-int angle_voile[9] = {45, 55, 65, 75, 90, 105, 115, 125, 135}; //angles possibles pour le gouvernail
+int angle_voile[9] = {86, 87, 88, 89, 90, 91, 92, 93, 94}; //angles possibles pour le gouvernail
 
 int power[5] = {0, 10, 30, 50, 100}; //intensite des leds
 
@@ -61,9 +61,7 @@ void loop() {
       }
       Serial.print("Nouvel angle :");
       Serial.println(position_gouvernail);
-    }
-    
-    if (txt >= '0' & txt <= '8' & txt_prev == 'V') { // verification signal dans plage de valeur
+    } else if (txt >= '0' & txt <= '8' & txt_prev == 'V') { // verification signal dans plage de valeur
       int pos = txt - '0'; // conversion caractere en entier
       
       Serial.print("Signal recu :");
@@ -75,17 +73,18 @@ void loop() {
       }
       Serial.print("Nouvel angle :");
       Serial.println(position_voile);
-    }
-
-    if (txt >= '0' & txt <= '4' & txt_prev == 'L') {
+    } else if (txt >= '0' & txt <= '4' & txt_prev == 'L') {
       int intensite = txt - '0'; // conversion caractere en entier
       analogWrite(ledG, power[intensite]/2); //allumer led gauche
       analogWrite(ledM, power[intensite]); //allumer led milieu
       analogWrite(ledD, power[intensite]); //allumer led droite
+    } else if (txt < '0') { // pb transmission eteindre led du milieu
+      analogWrite(ledM, 0);
+      delay(300);
     }
     txt_prev = txt;
+    
   }
-
 }
 
 
@@ -94,7 +93,7 @@ int bougerServoDroite(Servo myservo, int position_actuelle, int angle){
   for (int pos = position_actuelle; pos <= angle; pos += 1) { // partir de 0 degrés vers l'angle max
     // in steps of 1 degree
     myservo.write(pos);
-    delay(15);
+    delay(10);
   }
   return angle;
 }
@@ -102,7 +101,7 @@ int bougerServoDroite(Servo myservo, int position_actuelle, int angle){
 int bougerServoGauche(Servo myservo, int position_actuelle, int angle){
   for (int pos = position_actuelle; pos >= angle; pos -= 1) { // partir de 0 degrés vers l'angle min
     myservo.write(pos);
-    delay(15);
+    delay(10);
   }
   return angle;
 }
